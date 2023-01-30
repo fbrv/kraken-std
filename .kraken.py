@@ -13,6 +13,7 @@ from kraken.std.git import git_describe
 
 project = Project.current()
 python.pyupgrade(additional_files=[__file__, project.directory / "examples"], keep_runtime_typing=True)
+python.pycln()
 python.black(additional_files=[__file__, project.directory / "examples"])
 python.flake8()
 python.isort(additional_files=[__file__, project.directory / "examples"])

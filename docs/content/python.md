@@ -11,6 +11,7 @@ __Supported tools__
 * Flake8
 * isort
 * Mypy
+* Pycln
 * Pylint
 * Pytest
 * Pyupgrade
@@ -83,6 +84,12 @@ Independent of the Python build system used, Kraken will use [Twine][] to publis
 @pydoc kraken.std.python.tasks.mypy_stubtest.MypyStubtestTask
 
 @pydoc kraken.std.python.tasks.mypy_stubtest.mypy_stubtest
+
+### Pycln
+
+@pydoc kraken.std.python.tasks.pycln.PyclnTask
+
+@pydoc kraken.std.python.tasks.pycln.pycln
 
 ### Pylint
 

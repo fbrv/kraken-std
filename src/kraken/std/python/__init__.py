@@ -8,6 +8,7 @@ from .tasks.login_task import login
 from .tasks.mypy_subtest_task import MypyStubtestTask, mypy_subtest
 from .tasks.mypy_task import MypyTask, mypy
 from .tasks.publish_task import PublishTask, publish
+from .tasks.pycln_task import PyclnTask, pycln
 from .tasks.pylint_task import PylintTask, pylint
 from .tasks.pytest_task import PytestTask, pytest
 from .tasks.pyupgrade_task import PyUpgradeCheckTask, PyUpgradeTask, pyupgrade
@@ -36,6 +37,8 @@ __all__ = [
     "MypyStubtestTask",
     "publish",
     "PublishTask",
+    "pycln",
+    "PyclnTask",
     "pylint",
     "PylintTask",
     "pytest",
