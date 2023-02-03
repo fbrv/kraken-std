@@ -47,7 +47,6 @@ class GitignoreSyncTask(RenderFileTask):
             has_paths = set(gitignore.paths())
 
             if comment_header is not None:
-
                 # Remove all existing paths, we'll make sure they're located under the header.
                 for path in paths:
                     if path in has_paths:

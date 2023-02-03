@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING
 from urllib.parse import quote
 
 from kraken.common import NotSet
+from kraken.core import TaskStatus
 
 from kraken.std.python.buildsystem.poetry import PoetryPythonBuildSystem
 from kraken.std.python.pyproject import Pyproject
@@ -40,6 +41,9 @@ class SlapPythonBuildSystem(PythonBuildSystem):
     def update_pyproject(self, settings: PythonSettings, pyproject: Pyproject) -> None:
         if "poetry" in pyproject.get("tool", {}):
             PoetryPythonBuildSystem(self.project_directory).update_pyproject(settings, pyproject)
+
+    def update_lockfile(self, settings: PythonSettings, pyproject: Pyproject) -> TaskStatus:
+        return TaskStatus.skipped("not supported")
 
     def requires_login(self) -> bool:
         return False

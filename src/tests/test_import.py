@@ -6,9 +6,7 @@ from typing import Iterable, Iterator
 
 
 def iter_modules_recursively(prefix: str, path: Iterable[str | Path]) -> Iterator[str]:
-
     for p in map(Path, path):
-
         # Need at least one Python file in the directory to continue searching subdirectories.
         has_py_file = False
         subdirs = []

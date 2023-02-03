@@ -22,7 +22,6 @@ REGISTRY_PORT = 5000
 @pytest.fixture
 def oci_registry(docker_service_manager: DockerServiceManager) -> Iterator[str]:  # noqa: F811
     with tempfile.TemporaryDirectory() as tempdir:
-
         # Create a htpasswd file for the registry.
         logger.info("Generating htpasswd for OCI registry")
         htpasswd_content = not_none(

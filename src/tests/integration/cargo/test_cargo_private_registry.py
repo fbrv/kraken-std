@@ -58,7 +58,6 @@ class CargoRepositoryWithAuth:
 
 
 def publish_lib_and_build_app(repository: CargoRepositoryWithAuth | None, tempdir: Path) -> None:
-
     # Copy the Cargo project files to a temporary directory.
     data_dir = tempdir
     data_source_dir = Path(__file__).parent / "data"
@@ -70,7 +69,6 @@ def publish_lib_and_build_app(repository: CargoRepositoryWithAuth | None, tempdi
     logger.info("==== Publish version is %s", publish_version)
 
     with unittest.mock.patch.dict(os.environ, {"CARGO_HOME": str(tempdir)}):
-
         # Build the library and publish it to Artifactory.
         if repository:
             logger.info(

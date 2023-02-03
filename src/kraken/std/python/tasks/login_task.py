@@ -6,7 +6,6 @@ from ..settings import PythonSettings, python_settings
 
 
 class LoginTask(Task):
-
     settings: Property[PythonSettings]
 
     def prepare(self) -> TaskStatus | None:

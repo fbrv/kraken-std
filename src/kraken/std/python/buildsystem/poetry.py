@@ -13,6 +13,7 @@ from typing import List
 from kraken.common import NotSet
 from kraken.common.path import is_relative_to
 from kraken.common.pyenv import get_current_venv
+from kraken.core import TaskStatus
 
 from kraken.std.python.pyproject import Pyproject
 from kraken.std.python.settings import PythonSettings
@@ -40,6 +41,11 @@ class PoetryPythonBuildSystem(PythonBuildSystem):
         for index in settings.package_indexes.values():
             if index.is_package_source:
                 pyproject.upsert_poetry_source(index.alias, index.index_url, index.default, not index.default)
+
+    def update_lockfile(self, settings: PythonSettings, pyproject: Pyproject) -> TaskStatus:
+        command = ["poetry", "update"]
+        sp.check_call(command, cwd=self.project_directory)
+        return TaskStatus.succeeded()
 
     def requires_login(self) -> bool:
         return True

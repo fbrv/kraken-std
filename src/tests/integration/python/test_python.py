@@ -18,7 +18,6 @@ USER_PASS = "password-for-integration-test"
 
 @pytest.fixture
 def pypiserver(docker_service_manager: DockerServiceManager, tempdir: Path) -> str:
-
     # Create a htpasswd file for the registry.
     logger.info("Generating htpasswd for Pypiserver")
     htpasswd_content = not_none(
