@@ -110,9 +110,20 @@ jobs:
   docs-publish:
     needs: [ test, docs ]
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/develop' }}
     steps:
     - uses: actions/download-artifact@v2
       with: { name: docs, path: docs/_site }
     - uses: Cecilapp/GitHub-Pages-deploy@v3
       env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
       with: { email: rosensteinniklas@gmail.com, build_dir: docs/_site }
+
+  require-changelog-in-pr:
+    name: A changelog entry was added to the Pull Request
+    runs-on: ubuntu-latest
+    if: github.base_ref != '' && !contains(github.event.pull_request.labels.*.name, 'no changelog')  # Only on pull_request or pull_request_target events, and if the PR is not labeled
+    steps:
+    - uses: actions/checkout@v2
+    - run: git fetch
+    - name: Ensure a changelog entry was added.
+      run: "! git diff origin/${{ github.base_ref }}..origin/${{ github.head_ref }} --exit-code -- .changelog/_unreleased.toml"

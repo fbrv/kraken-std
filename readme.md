@@ -23,6 +23,13 @@ and requires credentials to temporarily create a new Cargo repository (available
 
 __Test a single integration test__
 
-    ```
-    PYTEST_FLAGS="--log-cli-level DEBUG -s -k <test_filter>" kraken run pytestIntegration -v
-    ```
+```
+PYTEST_FLAGS="--log-cli-level DEBUG -s -k <test_filter>" kraken run pytestIntegration -v
+```
+
+### Pull Requests
+
+By default, Pull Requests require a changelog entry to be added via the `slap changelog add` command. If no changelog
+entry was added, CI will fail. Some changes are not relevant to consumers of the API that they do not need to be
+recorded in the changelog, such as typos in the README. In such cases, the `no changelog` label can be added to the
+Pull Request.
