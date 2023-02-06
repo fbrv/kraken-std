@@ -118,12 +118,16 @@ jobs:
       env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
       with: { email: rosensteinniklas@gmail.com, build_dir: docs/_site }
 
-  require-changelog-in-pr:
-    name: A changelog entry was added to the Pull Request
+  changelog-update:
+    name: "Insert the Pull Request URL into new changelog entries"
     runs-on: ubuntu-latest
-    if: github.base_ref != '' && !contains(github.event.pull_request.labels.*.name, 'no changelog')  # Only on pull_request or pull_request_target events, and if the PR is not labeled
+    if: github.event_name == 'pull_request'
     steps:
-    - uses: actions/checkout@v2
-    - run: git fetch
-    - name: Ensure a changelog entry was added.
-      run: "! git diff origin/${{ github.base_ref }}..origin/${{ github.head_ref }} --exit-code -- .changelog/_unreleased.toml"
+      - uses: NiklasRosenstein/slap@gha/changelog/update/v2
+
+  assert-new-changelog-entries:
+    name: "Assert that new changelog entries have been added"
+    runs-on: ubuntu-latest
+    if: github.base_ref != '' && !contains(github.event.pull_request.labels.*.name, 'no changelog')
+    steps:
+      - uses: NiklasRosenstein/slap@gha/changelog/assert-added/v2
