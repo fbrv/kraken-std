@@ -17,10 +17,13 @@ from .base_task import EnvironmentAwareDispatchTask
 
 class PyUpgradeTask(EnvironmentAwareDispatchTask):
     description = "Upgrades to newer Python syntax sugars with pyupgrade."
+    python_dependencies = ["pyupgrade"]
 
     keep_runtime_typing: Property[bool] = Property.config(default=False)
     additional_files: Property[List[Path]] = Property.config(default_factory=list)
     python_version: Property[str]
+
+    # EnvironmentAwareDispatchTask
 
     def get_execute_command(self) -> List[str]:
         return self.run_pyupgrade(self.additional_files.get(), ("--exit-zero-even-if-changed",))
@@ -35,6 +38,7 @@ class PyUpgradeTask(EnvironmentAwareDispatchTask):
 
 class PyUpgradeCheckTask(PyUpgradeTask):
     description = "Check Python source files syntax sugars with pyupgrade."
+    python_dependencies = ["pyupgrade"]
 
     keep_runtime_typing: Property[bool] = Property.config(default=False)
     additional_files: Property[List[Path]] = Property.config(default_factory=list)

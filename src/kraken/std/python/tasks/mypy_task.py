@@ -10,11 +10,15 @@ from .base_task import EnvironmentAwareDispatchTask
 
 class MypyTask(EnvironmentAwareDispatchTask):
     description = "Static type checking for Python code using Mypy."
+    python_dependencies = ["mypy"]
+
     config_file: Property[Path]
     additional_args: Property[List[str]] = Property.config(default_factory=list)
     check_tests: Property[bool] = Property.config(default=True)
     use_daemon: Property[bool] = Property.config(default=True)
     python_version: Property[str]
+
+    # EnvironmentAwareDispatchTask
 
     def get_execute_command(self) -> list[str]:
         # TODO (@NiklasRosenstein): Should we somewhere add a task that ensures `.dmypy.json` is in `.gitignore`?

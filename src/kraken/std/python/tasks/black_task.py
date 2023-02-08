@@ -12,6 +12,8 @@ from .base_task import EnvironmentAwareDispatchTask
 class BlackTask(EnvironmentAwareDispatchTask):
     """A task to run the `black` formatter to either check for necessary changes or apply changes."""
 
+    python_dependencies = ["black"]
+
     check_only: Property[bool] = Property.config(default=False)
     config_file: Property[Path]
     additional_args: Property[List[str]] = Property.config(default_factory=list)

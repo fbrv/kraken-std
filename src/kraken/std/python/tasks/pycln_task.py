@@ -12,10 +12,14 @@ from .base_task import EnvironmentAwareDispatchTask
 class PyclnTask(EnvironmentAwareDispatchTask):
     """A task to run the `pycln` formatter to either check for necessary changes or apply changes."""
 
+    python_dependencies = ["pycln"]
+
     check_only: Property[bool] = Property.config(default=False)
     config_file: Property[Path]
     additional_args: Property[List[str]] = Property.config(default_factory=list)
     additional_files: Property[List[Path]] = Property.config(default_factory=list)
+
+    # EnvironmentAwareDispatchTask
 
     def get_execute_command(self) -> list[str]:
         command = ["pycln", str(self.settings.source_directory)]

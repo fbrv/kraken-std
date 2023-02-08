@@ -15,10 +15,14 @@ from .base_task import EnvironmentAwareDispatchTask
 
 class PytestTask(EnvironmentAwareDispatchTask):
     description = "Run unit tests using Pytest."
+    python_dependencies = ["pytest"]
+
     tests_dir: Property[Path]
     ignore_dirs: Property[List[Path]] = Property.config(default_factory=list)
     allow_no_tests: Property[bool] = Property.config(default=False)
     marker: Property[str]
+
+    # EnvironmentAwareDispatchTask
 
     def is_skippable(self) -> bool:
         return self.allow_no_tests.get() and self.tests_dir.is_empty() and not self.settings.get_tests_directory()

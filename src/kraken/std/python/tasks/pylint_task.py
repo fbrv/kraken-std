@@ -10,8 +10,12 @@ from .base_task import EnvironmentAwareDispatchTask
 
 class PylintTask(EnvironmentAwareDispatchTask):
     description = "Lint Python source files with Pylint"
+    python_dependencies = ["pylint"]
+
     config_file: Property[Path]
     additional_args: Property[List[str]] = Property.config(default_factory=list)
+
+    # EnvironmentAwareDispatchTask
 
     def get_execute_command(self) -> list[str]:
         command = ["pylint", str(self.settings.source_directory)] + self.settings.get_tests_directory_as_args()

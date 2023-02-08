@@ -10,11 +10,15 @@ from .base_task import EnvironmentAwareDispatchTask
 
 class MypyStubtestTask(EnvironmentAwareDispatchTask):
     description = "Static validation for Python type stubs using Mypy."
+    python_dependencies = ["mypy"]
+
     package: Property[str]
     ignore_missing_stubs: Property[bool] = Property.default(False)
     ignore_positional_only: Property[bool] = Property.default(False)
     allowlist: Property[Path]
     mypy_config_file: Property[Path]
+
+    # EnvironmentAwareDispatchTask
 
     def get_execute_command(self) -> list[str]:
         command = ["python", "-m", "mypy.stubtest", self.package.get()]

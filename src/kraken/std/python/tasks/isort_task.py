@@ -10,9 +10,13 @@ from .base_task import EnvironmentAwareDispatchTask
 
 
 class IsortTask(EnvironmentAwareDispatchTask):
+    python_dependencies = ["isort"]
+
     check_only: Property[bool] = Property.config(default=False)
     config_file: Property[Path]
     additional_files: Property[List[Path]] = Property.config(default_factory=list)
+
+    # EnvironmentAwareDispatchTask
 
     def get_execute_command(self) -> list[str]:
         command = ["isort", str(self.settings.source_directory)] + self.settings.get_tests_directory_as_args()
