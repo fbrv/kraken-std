@@ -18,6 +18,7 @@ from .tasks.cargo_fmt_task import CargoFmtTask
 from .tasks.cargo_publish_task import CargoPublishTask
 from .tasks.cargo_sync_config_task import CargoSyncConfigTask
 from .tasks.cargo_test_task import CargoTestTask
+from .tasks.cargo_update_task import CargoUpdateTask
 
 __all__ = [
     "cargo_auth_proxy",
@@ -28,6 +29,7 @@ __all__ = [
     "cargo_publish",
     "cargo_registry",
     "cargo_sync_config",
+    "cargo_update",
     "CargoAuthProxyTask",
     "CargoBuildTask",
     "CargoBumpVersionTask",
@@ -144,6 +146,14 @@ def cargo_fmt(*, all_packages: bool = False, project: Project | None = None) -> 
     project = project or Project.current()
     project.do("cargoFmt", CargoFmtTask, all_packages=all_packages, group="fmt")
     project.do("cargoFmtCheck", CargoFmtTask, all_packages=all_packages, group="lint", check=True)
+
+
+def cargo_update(*, project: Project | None = None) -> CargoUpdateTask:
+    project = project or Project.current()
+    task = project.do("cargoUpdate", CargoUpdateTask, group="update")
+    task.add_relationship(":cargoBuildSupport", strict=True)
+
+    return task
 
 
 def cargo_bump_version(
