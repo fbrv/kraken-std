@@ -93,6 +93,7 @@ def pyupgrade(*, name: str = "python.pyupgrade", project: Project | None = None,
         chain.from_iterable(
             Path(p).glob("**/*.py")
             for p in (*kwargs.pop("additional_files", ()), settings.source_directory, settings.get_tests_directory())
+            if p is not None
         )
     )
     check_task = project.do(f"{name}.check", PyUpgradeCheckTask, group="lint", **kwargs, additional_files=files)
