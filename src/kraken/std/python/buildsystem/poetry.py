@@ -67,12 +67,12 @@ class PoetryPythonBuildSystem(PythonBuildSystem):
         return self.project_directory / "dist"
 
     def build(self, output_directory: Path, as_version: str | None = None) -> list[Path]:
+        old_version = None
+        pyproject_path = self.project_directory / "pyproject.toml"
         if as_version is not None:
-            # TODO (@NiklasRosenstein): We should find a way to revert the changes to the worktree
-            #       that this command does.
-            command = ["poetry", "version", as_version]
-            logger.info("%s", command)
-            sp.check_call(command, cwd=self.project_directory)
+            pyproject = Pyproject.read(pyproject_path)
+            old_version = pyproject.set_poetry_version(as_version)
+            pyproject.save()
 
         # Poetry does not allow configuring the output folder, so it's always going to be "dist/".
         # We remove the contents of that folder to make sure we know what was produced.
@@ -91,6 +91,12 @@ class PoetryPythonBuildSystem(PythonBuildSystem):
         # Unless the output directory is a subdirectory of the dist_dir, we remove the dist dir again.
         if not is_relative_to(output_directory, dist_dir):
             shutil.rmtree(dist_dir)
+
+        if as_version is not None:
+            # We roll back the version
+            pyproject = Pyproject.read(pyproject_path)
+            pyproject.set_poetry_version(old_version)
+            pyproject.save()
 
         return dst_files
 

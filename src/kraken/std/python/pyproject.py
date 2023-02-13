@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, MutableMapping
+from typing import Any, Dict, Iterator, MutableMapping
 
 import tomli
 import tomli_w
@@ -52,10 +52,10 @@ class Pyproject(MutableMapping[str, Any]):
             tomli_w.dump(self.to_json(), fp)
 
     def get_poetry_sources(self) -> list[dict[str, Any]]:
-        return list(self.setdefault("tool", {}).setdefault("poetry", {}).setdefault("source", []))
+        return list(self._poetry_section().setdefault("source", []))
 
     def delete_poetry_source(self, source_name: str) -> None:
-        sources_conf = self.setdefault("tool", {}).setdefault("poetry", {}).setdefault("source", [])
+        sources_conf = self._poetry_section().setdefault("source", [])
         index = next((i for i, v in enumerate(sources_conf) if v["name"] == source_name), None)
         if index is None:
             raise KeyError(source_name)
@@ -67,7 +67,7 @@ class Pyproject(MutableMapping[str, Any]):
             source_config["default"] = True
         if secondary:
             source_config["secondary"] = True
-        sources_conf = self.setdefault("tool", {}).setdefault("poetry", {}).setdefault("source", [])
+        sources_conf = self._poetry_section().setdefault("source", [])
 
         # Find the source with the same name and update it, or create a new one.
         source = next((x for x in sources_conf if x["name"] == source_name), None)
@@ -75,3 +75,16 @@ class Pyproject(MutableMapping[str, Any]):
             sources_conf.append(source_config)
         else:
             source.update(source_config)
+
+    def set_poetry_version(self, version: str | None) -> str | None:
+        """Updates the poetry version field and returns the previous value"""
+        config = self._poetry_section()
+        old_version = config.get("version")
+        if version is None:
+            del config["version"]
+        else:
+            config["version"] = version
+        return old_version
+
+    def _poetry_section(self) -> Dict[str, Any]:
+        return self.setdefault("tool", {}).setdefault("poetry", {})  # type: ignore[no-any-return]
