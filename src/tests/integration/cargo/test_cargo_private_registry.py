@@ -151,9 +151,9 @@ def test__artifactory_cargo_publish_and_consume(tempdir: Path) -> None:
     credentials = json.loads(os.environ[ARTIFACTORY_VAR])
     repository = CargoRepositoryWithAuth(
         "kraken-std-cargo-integration-test",
-        credentials["url"] + "/git/kraken-std-cargo-integration-test.git",
+        credentials["url"] + f"/git/{os.environ['ARTIFACTORY_CARGO_REPOSITORY']}.git",
         credentials["user"],
-        credentials["password"],
+        credentials["token"],
         "Bearer " + credentials["token"],
     )
     publish_lib_and_build_app(repository, tempdir)
@@ -165,7 +165,10 @@ def test__cloudsmith_cargo_publish_and_consume(tempdir: Path) -> None:
     credentials = json.loads(os.environ[CLOUDSMITH_VAR])
     repository = CargoRepositoryWithAuth(
         "kraken-std-cargo-integration-test",
-        "https://dl.cloudsmith.io/basic/niklas-rosenstein-OJj/kraken-std-cargo-integration-test/cargo/index.git",
+        (
+            f"https://dl.cloudsmith.io/basic/{credentials['owner']}/"
+            f"{os.environ['CLOUDSMITH_CARGO_REPOSITORY']}/cargo/index.git"
+        ),
         credentials["user"],
         credentials["api_key"],
         credentials["api_key"],

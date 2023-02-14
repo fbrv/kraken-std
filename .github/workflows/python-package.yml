@@ -47,26 +47,22 @@ jobs:
     # Make sure we have Docker available for the ete-tests.
     - uses: docker/setup-buildx-action@v2
 
-    # Import credentials for integration tests.
-    - name: Import Secrets
-      uses: hashicorp/vault-action@v2.4.0
-      with:
-        url: ${{ secrets.VAULT_ADDR }}
-        token: ${{ secrets.VAULT_TOKEN }}
-        secrets: |
-          kv/data/projects/github.com/kraken-build/kraken-std cloudsmith_io | CLOUDSMITH_INTEGRATION_TEST_CREDENTIALS ;
-          kv/data/projects/github.com/kraken-build/kraken-std cloudsmith_io.api_key | CLOUDSMITH_API_KEY ;
-          kv/data/projects/github.com/kraken-build/kraken-std niklasrosenstein_jfrog_io | ARTIFACTORY_INTEGRATION_TEST_CREDENTIALS ;
-          kv/data/projects/github.com/kraken-build/kraken-std niklasrosenstein_jfrog_io.password | ARTIFACTORY_PASSWORD ;
-          kv/data/projects/github.com/kraken-build/kraken-std niklasrosenstein_jfrog_io.token | ARTIFACTORY_TOKEN ;
-
-    - name: Mask secrets
-      run: |
-        echo "::add-mask::${{ env.CLOUDSMITH_API_KEY }}"
-        echo "::add-mask::${{ env.ARTIFACTORY_PASSWORD }}"
-        echo "::add-mask::${{ env.ARTIFACTORY_TOKEN }}"
-
     - run: krakenw run ${{ matrix.test-type }} -v
+      env:
+        ARTIFACTORY_CARGO_REPOSITORY: ${{ vars.ARTIFACTORY_CARGO_REPOSITORY }}
+        CLOUDSMITH_CARGO_REPOSITORY: ${{ vars.CLOUDSMITH_CARGO_REPOSITORY }}
+        CLOUDSMITH_INTEGRATION_TEST_CREDENTIALS: |
+          {
+            "api_key": "${{ secrets.CLOUDSMITH_API_KEY }}",
+            "owner": "${{ vars.CLOUDSMITH_OWNER }}",
+            "user": "${{ vars.CLOUDSMITH_USER }}"
+          }
+        ARTIFACTORY_INTEGRATION_TEST_CREDENTIALS: |
+          {
+            "token": "${{ secrets.ARTIFACTORY_TOKEN }}",
+            "url": "${{ vars.ARTIFACTORY_URL }}",
+            "user": "${{ vars.ARTIFACTORY_USER }}"
+          }
 
   publish:
     runs-on: ubuntu-latest
@@ -79,23 +75,12 @@ jobs:
       with: { python-version: "${{ matrix.python-version }}" }
     - run: pip install pipx && pipx install kraken-wrapper
 
-    # Import credentials for integration tests.
-    - name: Import Secrets
-      uses: hashicorp/vault-action@v2.4.0
-      with:
-        url: ${{ secrets.VAULT_ADDR }}
-        token: ${{ secrets.VAULT_TOKEN }}
-        secrets: |
-          kv/data/projects/github.com/kraken-build/kraken-std pypi_org.user | PYPI_USER ;
-          kv/data/projects/github.com/kraken-build/kraken-std pypi_org.password | PYPI_PASSWORD ;
-          kv/data/projects/github.com/kraken-build/kraken-std test_pypi_org.user | TESTPYPI_USER ;
-          kv/data/projects/github.com/kraken-build/kraken-std test_pypi_org.password | TESTPYPI_PASSWORD ;
-    - name: Mask secrets
-      run: |
-        echo "::add-mask::${{ env.PYPI_PASSWORD }}"
-        echo "::add-mask::${{ env.TESTPYPI_PASSWORD }}"
-
     - run: krakenw run publish? -0 -v
+      env:
+        PYPI_USER: __token__
+        PYPI_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        TESTPYPI_USER: __token__
+        TESTPYPI_PASSWORD: ${{ secrets.PYPI_TEST_TOKEN }}
 
   docs:
     runs-on: ubuntu-latest
