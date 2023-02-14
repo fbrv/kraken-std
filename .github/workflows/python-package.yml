@@ -3,7 +3,6 @@ name: Python application
 on:
   push: { branches: [ develop ], tags: [ "*" ] }
   pull_request:
-  pull_request_target:
 
 jobs:
   test:
