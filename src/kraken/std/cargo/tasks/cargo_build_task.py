@@ -86,13 +86,20 @@ class CargoBuildTask(Task):
             manifest = CargoMetadata.read(self.project.directory)
             target_dir = self.project.directory / os.getenv("CARGO_TARGET_DIR", "target") / self.target.get()
             for artifact in manifest.artifacts:
-                # Hack to brute force copy multiple lib suffixes
-                filenames = target_dir.glob(artifact.name + "*")
-                for f in filenames:
-                    if artifact.kind is ArtifactKind.BIN:
-                        out_binaries.append(CargoBinaryArtifact(artifact.name, f))
-                    elif artifact.kind is ArtifactKind.LIB:
-                        out_libraries.append(CargoLibraryArtifact(artifact.name, f))
+                # Rust binaries have an extensionless name whereas libraries are prefixed with "lib" and suffixed with
+                #
+                # - ".rlib" for Rust libraries
+                # - ".so" (Linux), ".dylib" (macOS) or ".dll" (Windows) for dynamic Rust and system libraries
+                # - ".a" (Linux, macOS) or ".lib" (Windows) for static system libraries
+                #
+                # We create all options for libraries and check for presence of at least one later.
+                if artifact.kind is ArtifactKind.BIN:
+                    out_binaries.append(CargoBinaryArtifact(artifact.name, target_dir / artifact.name))
+                elif artifact.kind is ArtifactKind.LIB:
+                    base_name = f"lib{artifact.name}"
+                    for file_extension in ["rlib", "so", "dylib", "dll", "a", "lib"]:
+                        filename = ".".join([base_name, file_extension])
+                        out_libraries.append(CargoLibraryArtifact(base_name, target_dir / filename))
 
         self.out_binaries.set(out_binaries)
         self.out_libraries.set(out_libraries)
@@ -103,10 +110,11 @@ class CargoBuildTask(Task):
             result = sp.call(command, cwd=self.project.directory, env={**os.environ, **env})
 
             if result == 0:
+                # Check that binaries which were due have been built.
                 for out_bin in out_binaries:
                     assert out_bin.path.is_file(), out_bin
-                for out_lib in out_libraries:
-                    assert out_lib.path.is_file(), out_lib
+                # Check that at least one library has been built if libraries were due.
+                assert not out_libraries or any(lib.path.is_file() for lib in out_libraries), out_libraries[0].name
                 break
             else:
                 total_attempts -= 1
