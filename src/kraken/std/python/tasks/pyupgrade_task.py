@@ -54,7 +54,7 @@ class PyUpgradeCheckTask(PyUpgradeTask):
                 new_file.parent.mkdir(parents=True, exist_ok=True)
                 new_file.write_bytes(file.read_bytes())
                 new_file_for_old_file[file] = new_file
-                self._files = new_file_for_old_file.values()
+            self._files = new_file_for_old_file.values()
 
             result = super().execute()
             if not result.is_failed():
