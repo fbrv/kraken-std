@@ -98,7 +98,7 @@ class CargoBuildTask(Task):
                 elif artifact.kind is ArtifactKind.LIB:
                     base_name = f"lib{artifact.name}"
                     for file_extension in ["rlib", "so", "dylib", "dll", "a", "lib"]:
-                        filename = ".".join([base_name, file_extension])
+                        filename = ".".join([base_name, file_extension]).replace("-", "_")
                         out_libraries.append(CargoLibraryArtifact(base_name, target_dir / filename))
 
         self.out_binaries.set(out_binaries)
