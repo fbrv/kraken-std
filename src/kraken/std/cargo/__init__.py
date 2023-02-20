@@ -13,6 +13,7 @@ from .config import CargoProject, CargoRegistry
 from .tasks.cargo_auth_proxy_task import CargoAuthProxyTask
 from .tasks.cargo_build_task import CargoBuildTask
 from .tasks.cargo_bump_version_task import CargoBumpVersionTask
+from .tasks.cargo_check_toolchain_version import CargoCheckToolchainVersionTask
 from .tasks.cargo_clippy_task import CargoClippyTask
 from .tasks.cargo_fmt_task import CargoFmtTask
 from .tasks.cargo_publish_task import CargoPublishTask
@@ -39,6 +40,8 @@ __all__ = [
     "CargoRegistry",
     "CargoSyncConfigTask",
     "CargoTestTask",
+    "cargo_check_toolchain_version",
+    "CargoCheckToolchainVersionTask",
 ]
 
 #: This is the name of a group in every project that contains Cargo tasks to contain the tasks that either support
@@ -313,3 +316,17 @@ def cargo_publish(
     task.add_relationship(f":{CARGO_PUBLISH_SUPPORT_GROUP_NAME}?")
 
     return task
+
+
+def cargo_check_toolchain_version(
+    minimal_version: str, *, project: Project | None = None
+) -> CargoCheckToolchainVersionTask:
+    """Creates a task that checks that cargo is at least at version `minimal_version`"""
+
+    project = project or Project.current()
+    return project.do(
+        f"cargoCheckVersion/{minimal_version}",
+        CargoCheckToolchainVersionTask,
+        group=CARGO_BUILD_SUPPORT_GROUP_NAME,
+        minimal_version=minimal_version,
+    )
