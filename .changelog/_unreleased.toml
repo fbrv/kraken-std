@@ -1,0 +1,6 @@
+[[entries]]
+id = "8906b2ba-d643-4e7c-8cb3-0a9fd993e912"
+type = "fix"
+description = "Compatibility of pyproject.toml with Poetry."
+author = "@Tpt"
+pr = "https://github.com/kraken-build/kraken-std/pull/100"
