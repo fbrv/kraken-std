@@ -20,6 +20,7 @@ class PytestTask(EnvironmentAwareDispatchTask):
     tests_dir: Property[Path]
     ignore_dirs: Property[List[Path]] = Property.config(default_factory=list)
     allow_no_tests: Property[bool] = Property.config(default=False)
+    doctest_modules: Property[bool] = Property.config(default=True)
     marker: Property[str]
 
     # EnvironmentAwareDispatchTask
@@ -33,11 +34,18 @@ class PytestTask(EnvironmentAwareDispatchTask):
         if not tests_dir:
             print("error: no test directory configured and none could be detected")
             return TaskStatus.failed("no test directory configured and none could be detected")
-        command = ["pytest", "-vv", str(self.project.directory / tests_dir)]
+        command = [
+            "pytest",
+            "-vv",
+            str(self.project.directory / self.settings.source_directory),
+            str(self.project.directory / tests_dir),
+        ]
         command += flatten(["--ignore", str(self.project.directory / path)] for path in self.ignore_dirs.get())
         command += ["--log-cli-level", "INFO"]
         if self.marker.is_filled():
             command += ["-m", self.marker.get()]
+        if self.doctest_modules.get():
+            command += ["--doctest-modules"]
         command += shlex.split(os.getenv("PYTEST_FLAGS", ""))
         return command
 

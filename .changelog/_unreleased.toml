@@ -4,3 +4,10 @@ type = "fix"
 description = "Compatibility of pyproject.toml with Poetry."
 author = "@Tpt"
 pr = "https://github.com/kraken-build/kraken-std/pull/100"
+
+[[entries]]
+id = "394bde18-7149-4e77-bfda-aa44569a0dcb"
+type = "improvement"
+description = "Enable `pytest --doctest-modules` flag (controlled by `PytestTask.doctest_modules`, enabled by default)."
+author = "@NiklasRosenstein"
+pr = "https://github.com/kraken-build/kraken-std/pull/101"
