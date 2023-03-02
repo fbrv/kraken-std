@@ -5,7 +5,7 @@ from typing import Iterator
 
 import pytest
 
-from tests.utils.docker import DockerServiceManager
+from tests.util.docker import DockerServiceManager
 
 
 @pytest.fixture

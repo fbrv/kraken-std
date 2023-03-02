@@ -8,7 +8,7 @@ import pytest
 from kraken.common import not_none
 from kraken.core.api import Context
 
-from tests.utils.docker import DockerServiceManager
+from tests.util.docker import DockerServiceManager
 
 logger = logging.getLogger(__name__)
 PYPISERVER_PORT = 23213

@@ -10,7 +10,7 @@ from kraken.common import not_none
 from kraken.core.api import Project
 
 from kraken.std.helm import HelmPackageTask, HelmPushTask, helm_settings
-from tests.utils.docker import DockerServiceManager
+from tests.util.docker import DockerServiceManager
 
 logger = logging.getLogger(__name__)
 
