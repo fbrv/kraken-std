@@ -18,3 +18,10 @@ type = "improvement"
 description = "Move task to check a valid readme exists from kraken-hs, and refactoring"
 author = "@cdbrkfxrpt"
 pr = "https://github.com/kraken-build/kraken-std/pull/103"
+
+[[entries]]
+id = "2eec93ae-e407-4cfa-9de6-d9841a3d103b"
+type = "improvement"
+description = "Allows alpha, beta and RC pre-releases in version identifiers."
+author = "@Tpt"
+pr = "https://github.com/kraken-build/kraken-std/pull/102"
