@@ -25,3 +25,10 @@ type = "improvement"
 description = "Allows alpha, beta and RC pre-releases in version identifiers."
 author = "@Tpt"
 pr = "https://github.com/kraken-build/kraken-std/pull/102"
+
+[[entries]]
+id = "1a9d1e92-007b-444e-9c7f-5a1124d66c7e"
+type = "improvement"
+description = "Pyupgrade: allows to ignore files and directories"
+author = "@Tpt"
+pr = "https://github.com/kraken-build/kraken-std/pull/99"

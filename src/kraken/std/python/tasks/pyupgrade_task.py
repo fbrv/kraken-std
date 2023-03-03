@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import dataclasses
 from difflib import unified_diff
-from itertools import chain
 from pathlib import Path
 from sys import stdout
 from tempfile import TemporaryDirectory
-from typing import Any, Iterable, List
+from typing import Any, Collection, Iterable, List
 
 from kraken.core import TaskStatus
 from kraken.core.api import Project, Property
@@ -86,16 +85,41 @@ class PyUpgradeTasks:
     format: PyUpgradeTask
 
 
-def pyupgrade(*, name: str = "python.pyupgrade", project: Project | None = None, **kwargs: Any) -> PyUpgradeTasks:
+def pyupgrade(
+    *,
+    name: str = "python.pyupgrade",
+    project: Project | None = None,
+    exclude: Collection[Path] = (),
+    exclude_patterns: Collection[str] = (),
+    **kwargs: Any,
+) -> PyUpgradeTasks:
     project = project or Project.current()
     settings = python_settings(project)
-    files = list(
-        chain.from_iterable(
-            Path(p).glob("**/*.py")
-            for p in (*kwargs.pop("additional_files", ()), settings.source_directory, settings.get_tests_directory())
-            if p is not None
-        )
+
+    directories = [
+        p
+        for p in (*kwargs.pop("additional_files", ()), settings.source_directory, settings.get_tests_directory())
+        if p is not None
+    ]
+    files = {f.resolve() for p in directories for f in Path(p).glob("**/*.py")}
+    exclude = [e.resolve() for e in exclude]
+    filtered_files = [
+        f
+        for f in files
+        if not any(_is_relative_to(f, i) for i in exclude) and not any(f.match(p) for p in exclude_patterns)
+    ]
+
+    check_task = project.do(
+        f"{name}.check", PyUpgradeCheckTask, group="lint", **kwargs, additional_files=filtered_files
     )
-    check_task = project.do(f"{name}.check", PyUpgradeCheckTask, group="lint", **kwargs, additional_files=files)
-    format_task = project.do(name, PyUpgradeTask, group="fmt", default=False, **kwargs, additional_files=files)
+    format_task = project.do(name, PyUpgradeTask, group="fmt", default=False, **kwargs, additional_files=filtered_files)
     return PyUpgradeTasks(check_task, format_task)
+
+
+def _is_relative_to(a: Path, b: Path) -> bool:
+    # Polyfill for Python 3.7 and 3.8
+    try:
+        a.relative_to(b)
+        return True
+    except ValueError:
+        return False
