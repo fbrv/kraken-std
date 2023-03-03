@@ -8,7 +8,6 @@ import shutil
 import subprocess as sp
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import List
 
 from kraken.common import NotSet
 from kraken.common.path import is_relative_to
@@ -60,12 +59,6 @@ class PoetryPythonBuildSystem(PythonBuildSystem):
                 if code != 0:
                     raise RuntimeError(f"command {safe_command!r} failed with exit code {code}")
 
-    def build_command(self) -> List[str]:
-        return ["poetry", "build"]
-
-    def dist_dir(self) -> Path:
-        return self.project_directory / "dist"
-
     def build(self, output_directory: Path, as_version: str | None = None) -> list[Path]:
         old_version = None
         pyproject_path = self.project_directory / "pyproject.toml"
@@ -76,11 +69,11 @@ class PoetryPythonBuildSystem(PythonBuildSystem):
 
         # Poetry does not allow configuring the output folder, so it's always going to be "dist/".
         # We remove the contents of that folder to make sure we know what was produced.
-        dist_dir = self.dist_dir()
+        dist_dir = self.project_directory / "dist"
         if dist_dir.exists():
             shutil.rmtree(dist_dir)
 
-        command = self.build_command()
+        command = ["poetry", "build"]
         logger.info("%s", command)
         sp.check_call(command, cwd=self.project_directory)
         src_files = list(dist_dir.iterdir())

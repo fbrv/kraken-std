@@ -78,13 +78,35 @@ class Pyproject(MutableMapping[str, Any]):
 
     def set_poetry_version(self, version: str | None) -> str | None:
         """Updates the poetry version field and returns the previous value"""
-        config = self._poetry_section()
+        return self._set_version(self._poetry_section(), version)
+
+    def set_core_metadata_version(self, version: str | None) -> str | None:
+        """Updates the core metadata version field and returns the previous value"""
+        return self._set_version(self.setdefault("project", {}), version)
+
+    @staticmethod
+    def _set_version(config: Any, version: str | None) -> str | None:
+        """Updates the core metadata version field and returns the previous value"""
         old_version = config.get("version")
         if version is None:
-            del config["version"]
+            if "version" in config:
+                del config["version"]
         else:
             config["version"] = version
-        return old_version
+        return old_version  # type: ignore[no-any-return]
+
+    def synchronize_project_section_to_poetry_state(self) -> None:
+        poetry_section = self._poetry_section()
+        project_section = self.setdefault("project", {})
+        for field_name in ("name", "version"):
+            poetry_value = poetry_section.get(field_name)
+            project_value = project_section.get(field_name)
+            if poetry_value == project_value:
+                continue
+            elif poetry_value is None:
+                poetry_section[field_name] = project_value
+            else:
+                project_section[field_name] = poetry_value
 
     def _poetry_section(self) -> Dict[str, Any]:
         return self.setdefault("tool", {}).setdefault("poetry", {})  # type: ignore[no-any-return]

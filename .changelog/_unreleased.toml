@@ -32,3 +32,10 @@ type = "improvement"
 description = "Pyupgrade: allows to ignore files and directories"
 author = "@Tpt"
 pr = "https://github.com/kraken-build/kraken-std/pull/99"
+
+[[entries]]
+id = "734110fd-b00c-4db8-92d2-e0fe02e0252c'"
+type = "feature"
+description = "automatically set version for Maturin builds"
+author = "@Tpt"
+pr = "https://github.com/kraken-build/kraken-std/pull/92"
