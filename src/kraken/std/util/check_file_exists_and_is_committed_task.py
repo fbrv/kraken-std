@@ -7,10 +7,6 @@ from pathlib import Path
 from kraken.core.api import Project, Property, Task, TaskStatus
 
 
-import logging
-logger = logging.getLogger(__name__)
-
-
 class CheckFileExistsAndIsCommittedError(enum.Enum):
     DOES_NOT_EXIST = 1
     IS_NOT_COMMITTED = 2

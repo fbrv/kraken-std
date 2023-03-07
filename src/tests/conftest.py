@@ -1,5 +1,5 @@
-import os
 import contextlib
+import os
 import tempfile
 from pathlib import Path
 from typing import Iterator
