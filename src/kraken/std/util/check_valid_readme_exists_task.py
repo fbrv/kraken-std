@@ -17,7 +17,7 @@ README_CONTENT_NOT_ALLOWED = [
 ]
 
 
-class ValidationErrors(Enum):
+class CheckValidReadmeExistsError(Enum):
     DOES_NOT_EXIST = 1
     MULTIPLE_EXIST = 2
     INVALID_FILENAME = 3
@@ -25,22 +25,22 @@ class ValidationErrors(Enum):
     CONTENT_NOT_ALLOWED = 5
 
     def to_description(self) -> str:
-        if self == ValidationErrors.DOES_NOT_EXIST:
+        if self == CheckValidReadmeExistsError.DOES_NOT_EXIST:
             return "Readme does NOT exist!"
 
-        if self == ValidationErrors.MULTIPLE_EXIST:
+        if self == CheckValidReadmeExistsError.MULTIPLE_EXIST:
             return "Only one `readme` file is allowed in the root of your repository, you may have more!"
 
-        if self == ValidationErrors.INVALID_FILENAME:
+        if self == CheckValidReadmeExistsError.INVALID_FILENAME:
             return f"Invalid `readme` filename, please rename to uppercase > `{README_EXPECTED_FILENAME}`"
 
-        if self == ValidationErrors.FILE_TOO_SHORT:
+        if self == CheckValidReadmeExistsError.FILE_TOO_SHORT:
             return (
                 f"There is not enough content in your `readme` file. At least {str(README_MIN_LINES)}"
                 + " of non-empty lines of content are expected."
             )
 
-        if self == ValidationErrors.CONTENT_NOT_ALLOWED:
+        if self == CheckValidReadmeExistsError.CONTENT_NOT_ALLOWED:
             return (
                 "The content of your `readme` is probably a generated default. "
                 + "Please add content specific to your project."
@@ -76,22 +76,26 @@ class CheckValidReadmeExistsTask(Task):
         return TaskStatus.succeeded()
 
     @staticmethod
-    def _check(context: Path, bad_content_hashes: list[str]) -> Dict[ValidationErrors, bool]:
+    def _check(context: Path, bad_content_hashes: list[str]) -> Dict[CheckValidReadmeExistsError, bool]:
         errors = dict()
         available_files = CheckValidReadmeExistsTask._get_readme_paths(context)
 
-        errors[ValidationErrors.DOES_NOT_EXIST] = len(available_files) == 0
-        errors[ValidationErrors.MULTIPLE_EXIST] = len(available_files) > 1
+        errors[CheckValidReadmeExistsError.DOES_NOT_EXIST] = len(available_files) == 0
+        errors[CheckValidReadmeExistsError.MULTIPLE_EXIST] = len(available_files) > 1
 
         if len(available_files) == 1:
             readme_file = available_files[0]
             readme_path = context / readme_file
 
-            errors[ValidationErrors.INVALID_FILENAME] = CheckValidReadmeExistsTask._check_file_name(readme_file)
-            errors[ValidationErrors.FILE_TOO_SHORT] = CheckValidReadmeExistsTask._check_line_number(readme_path)
-            errors[ValidationErrors.CONTENT_NOT_ALLOWED] = CheckValidReadmeExistsTask._check_content_not_allowed_(
-                readme_path, bad_content_hashes
+            errors[CheckValidReadmeExistsError.INVALID_FILENAME] = CheckValidReadmeExistsTask._check_file_name(
+                readme_file
             )
+            errors[CheckValidReadmeExistsError.FILE_TOO_SHORT] = CheckValidReadmeExistsTask._check_line_number(
+                readme_path
+            )
+            errors[
+                CheckValidReadmeExistsError.CONTENT_NOT_ALLOWED
+            ] = CheckValidReadmeExistsTask._check_content_not_allowed_(readme_path, bad_content_hashes)
 
         return errors
 

@@ -16,7 +16,7 @@ pr = "https://github.com/kraken-build/kraken-std/pull/101"
 
 [[entries]]
 id = "57c61a58-46f4-48d9-b111-f7f44bbfa142"
-type = "improvement"
+type = "breaking change"
 description = "Move task to check a valid readme exists from kraken-hs, and refactoring"
 author = "@cdbrkfxrpt"
 pr = "https://github.com/kraken-build/kraken-std/pull/103"
