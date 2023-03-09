@@ -18,14 +18,14 @@ class CargoCheckToolchainVersionTask(Task):
         # we fetch Cargo version
         try:
             result = sp.check_output(["cargo", "--verbose", "--version"]).decode()
-            cargo_metadata = {key: value for key, value in re.findall(r"^([a-z]+):\s+(.*)\s+$", result, re.MULTILINE)}
+            cargo_metadata = {key: value for key, value in re.findall(r"^([a-z]+):\s+(.*)\s*$", result, re.MULTILINE)}
         except sp.CalledProcessError as e:
             logging.error(f"Rust Cargo tool returned error code {e.returncode}, are you sure it is properly installed?")
             logging.info("You can install cargo using https://rustup.rs/ or `brew install rustup-init` on macOS")
             return TaskStatus.failed("cargo not found")
-        if "version" not in cargo_metadata:
-            return TaskStatus.failed("No version found in cargo metadata")
-        cargo_version = cargo_metadata["version"]
+        if "release" not in cargo_metadata:
+            return TaskStatus.failed("No release found in cargo metadata")
+        cargo_version = cargo_metadata["release"]
 
         try:
             parsed_cargo_version = self._parse_version(cargo_version)
