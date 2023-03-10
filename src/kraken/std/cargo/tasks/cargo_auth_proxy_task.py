@@ -64,6 +64,13 @@ class CargoAuthProxyTask(BackgroundTask):
             cargo_http = cargo_config.setdefault("http", {})
             cargo_http["proxy"] = self.proxy_url.get()
             cargo_http["cainfo"] = str(self.proxy_cert_file.get().absolute())
+
+            for registry in self.registries.get():
+                if not registry.read_credentials:
+                    continue
+                entry = cargo_config["registries"][registry.alias]
+                entry["token"] = f"Bearer {registry.read_credentials[1]}"
+
             logger.info("updating %s", cargo_config_toml)
             fp = exit_stack.enter_context(
                 atomic_file_swap(cargo_config_toml, "w", always_revert=True, create_dirs=True)
