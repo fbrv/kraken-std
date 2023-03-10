@@ -68,8 +68,9 @@ class CargoAuthProxyTask(BackgroundTask):
             for registry in self.registries.get():
                 if not registry.read_credentials:
                     continue
-                entry = cargo_config["registries"][registry.alias]
-                entry["token"] = f"Bearer {registry.read_credentials[1]}"
+                if registry.alias in cargo_config["registries"]:
+                    entry = cargo_config["registries"][registry.alias]
+                    entry["token"] = f"Bearer {registry.read_credentials[1]}"
 
             logger.info("updating %s", cargo_config_toml)
             fp = exit_stack.enter_context(
