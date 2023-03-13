@@ -65,6 +65,7 @@ class PoetryPythonBuildSystem(PythonBuildSystem):
         if as_version is not None:
             pyproject = Pyproject.read(pyproject_path)
             old_version = pyproject.set_poetry_version(as_version)
+            pyproject.update_relative_packages(as_version)
             pyproject.save()
 
         # Poetry does not allow configuring the output folder, so it's always going to be "dist/".
