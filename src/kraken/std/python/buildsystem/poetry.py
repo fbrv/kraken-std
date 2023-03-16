@@ -14,6 +14,7 @@ from kraken.common.path import is_relative_to
 from kraken.common.pyenv import get_current_venv
 from kraken.core import TaskStatus
 
+from kraken.std.python.buildsystem.helpers import update_python_version_str
 from kraken.std.python.pyproject import Pyproject
 from kraken.std.python.settings import PythonSettings
 
@@ -61,11 +62,8 @@ class PoetryPythonBuildSystem(PythonBuildSystem):
 
     def build(self, output_directory: Path, as_version: str | None = None) -> list[Path]:
         old_version = None
-        pyproject_path = self.project_directory / "pyproject.toml"
         if as_version is not None:
-            pyproject = Pyproject.read(pyproject_path)
-            old_version = pyproject.set_poetry_version(as_version)
-            pyproject.save()
+            old_version = update_python_version_str(as_version, self.project_directory)
 
         # Poetry does not allow configuring the output folder, so it's always going to be "dist/".
         # We remove the contents of that folder to make sure we know what was produced.
@@ -87,9 +85,7 @@ class PoetryPythonBuildSystem(PythonBuildSystem):
 
         if as_version is not None:
             # We roll back the version
-            pyproject = Pyproject.read(pyproject_path)
-            pyproject.set_poetry_version(old_version)
-            pyproject.save()
+            update_python_version_str(old_version, self.project_directory)
 
         return dst_files
 

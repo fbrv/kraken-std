@@ -4,3 +4,10 @@ type = "improvement"
 description = "Updated .gitignore task to generate a comprehensive global .gitignore"
 author = "luke.bax@talktalk.net"
 pr = "https://github.com/kraken-build/kraken-std/pull/115"
+
+[[entries]]
+id = "97ce7edd-11b9-49cf-a54a-afa34de14173"
+type = "improvement"
+description = "Kraken now ensures that the `__version__` variable in Python source files that commonly contain it (e.g. `__init__.py`, `__about__.py`, `_version.py`) matches the version being published."
+author = "szymon.gula@helsing.ai"
+pr = "https://github.com/kraken-build/kraken-std/pull/108"
