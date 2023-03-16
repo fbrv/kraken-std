@@ -3,9 +3,18 @@ id = "c35a9d23-2db1-4dd0-8e04-088931ee0c9c"
 type = "breaking change"
 description = "Updated .gitignore task to generate a comprehensive global .gitignore"
 author = "luke.bax@talktalk.net"
+pr = "https://github.com/kraken-build/kraken-std/pull/115"
+
+[[entries]]
+id = "97ce7edd-11b9-49cf-a54a-afa34de14173"
+type = "improvement"
+description = "Kraken now ensures that the `__version__` variable in Python source files that commonly contain it (e.g. `__init__.py`, `__about__.py`, `_version.py`) matches the version being published."
+author = "szymon.gula@helsing.ai"
+pr = "https://github.com/kraken-build/kraken-std/pull/108"
 
 [[entries]]
 id = "eb334a1d-dfe5-427b-b791-7b5b43be9f1b"
 type = "feature"
 description = "Support python mono repositories by updating local dependencies with release version"
 author = "fabio.baravalle@gmail.com"
+pr = "https://github.com/kraken-build/kraken-std/pull/113"

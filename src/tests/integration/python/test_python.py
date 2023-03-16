@@ -1,13 +1,18 @@
+import filecmp
 import logging
 import os
 import shutil
+import tarfile
 import unittest.mock
 from pathlib import Path
 
 import pytest
+import tomli
 from kraken.common import not_none
 from kraken.core.api import Context
+from kraken.core.testing import kraken_project
 
+from kraken.std import python
 from tests.util.docker import DockerServiceManager
 
 logger = logging.getLogger(__name__)
@@ -92,3 +97,41 @@ def test__python_project_install_lint_and_publish(
     kraken_ctx.load_project(directory=tempdir / consumer_dir)
     kraken_ctx.execute([":python.install"])
     # TODO (@NiklasRosenstein): Test importing the consumer project.
+
+
+@unittest.mock.patch.dict(os.environ, {})
+def test__python_project_upgrade_python_version_string(
+    kraken_ctx: Context,
+    tempdir: Path,
+) -> None:
+    project_dir = "version-project"
+    tempdir /= project_dir
+    build_as_version = "9.9.9a1"
+    init_file = "src/version_project/__init__.py"
+    original_dir = Path(__file__).parent / "data" / project_dir
+    project_dist = tempdir / "build/python-dist"
+
+    # Copy the projects to the temporary directory.
+    shutil.copytree(original_dir, tempdir)
+    logger.info("Loading and executing Kraken project (%s)", tempdir)
+    Context.__init__(kraken_ctx, tempdir / "build")
+    with kraken_project(kraken_ctx, tempdir) as loc_project:
+        local_build_system = python.buildsystem.detect_build_system(tempdir)
+        python.settings.python_settings(project=loc_project, build_system=local_build_system)
+        python.build(as_version=build_as_version, project=loc_project)
+    kraken_ctx.execute([":build"])
+
+    # Check if files that were supposed to be temporarily modified are the same after the build.
+    assert filecmp.cmp(original_dir / "pyproject.toml", tempdir / "pyproject.toml", shallow=False)
+    assert filecmp.cmp(original_dir / init_file, tempdir / init_file, shallow=False)
+    # Check if generated files are named following proper version.
+    assert Path(project_dist / f"version_project-{build_as_version}.tar.gz").is_file()
+    assert Path(project_dist / f"version_project-{build_as_version}-py3-none-any.whl").is_file()
+    with tarfile.open(project_dist / f"version_project-{build_as_version}.tar.gz", "r:gz") as tar:
+        # Check if generated files store proper version.
+        init_file_ext = tar.extractfile(f"version_project-{build_as_version}/{init_file}")
+        assert init_file_ext is not None, ".tar.gz file does not contain an '__init__.py'"
+        assert f'__version__ = "{build_as_version}"' in init_file_ext.read().decode("UTF-8")
+        conf_file = tar.extractfile(f"version_project-{build_as_version}/pyproject.toml")
+        assert conf_file is not None, ".tar.gz file does not contain an 'pyproject.toml'"
+        assert build_as_version == tomli.loads(conf_file.read().decode("UTF-8"))["tool"]["poetry"]["version"]
