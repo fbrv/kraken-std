@@ -1,5 +1,5 @@
 [[entries]]
 id = "eb334a1d-dfe5-427b-b791-7b5b43be9f1b"
 type = "feature"
-description = "remove local path to depedencies and replace it with current project version"
+description = "Support python mono repositories by updating local dependencies with release version"
 author = "fabio.baravalle@gmail.com"
